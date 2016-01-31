@@ -15,7 +15,7 @@ The following **required** functionality is complete:
 * [x] User can pull to refresh the movie list
 
 The following **optional** features are implemented:
-* [x]Movies are displayed using a CollectionView and a TableView.
+* [x] Movies are displayed using a CollectionView and a TableView.
 
 The following **additional** features are implemented:
 
