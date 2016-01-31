@@ -13,11 +13,13 @@ import MBProgressHUD
 class MoviesViewController: UIViewController , UITableViewDataSource, UITableViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate {
 
     let refreshControl = UIRefreshControl()
+    @IBOutlet weak var NetworkLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var listView: UICollectionView!
     @IBOutlet weak var viewToggle: UISegmentedControl!
     
     var movies: [NSDictionary]?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.dataSource = self
@@ -25,6 +27,7 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
         listView.dataSource = self
         listView.delegate = self
         
+        NetworkLabel.hidden = true
         listView.hidden = true
         //start monitoring
         //[[AFNetworkReachabilityManager sharedManager] startMonitoring];
@@ -38,6 +41,15 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func delay(delay:Double, closure:()->()) {
+        dispatch_after(
+            dispatch_time(
+                DISPATCH_TIME_NOW,
+                Int64(delay * Double(NSEC_PER_SEC))
+            ),
+            dispatch_get_main_queue(), closure)
     }
     
     func refreshControlAction(refreshControl: UIRefreshControl) {
@@ -68,13 +80,28 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
                             print("response: \(responseDictionary)")
                             self.movies = responseDictionary["results"] as? [NSDictionary]
                             self.tableView.reloadData();
-                           
+                            self.NetworkLabel.hidden = true
                             refreshControl.endRefreshing()
+                    }
+                    else{
+                        self.NetworkLabel.hidden = false
+                        MBProgressHUD.hideHUDForView(self.view, animated: true)
+                        refreshControl.endRefreshing()
+                    }
+                    if(error != nil){
+                        self.NetworkLabel.hidden = false
+                        MBProgressHUD.hideHUDForView(self.view, animated: true)
+                        refreshControl.endRefreshing()
                     }
                 }
         });
+        
+            delay(0.5) {
+                
+            }
+            self.refreshControl.endRefreshing()
         task.resume()
-
+    
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
@@ -142,14 +169,20 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
         
         return cell
     }
-
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        let totalwidth = collectionView.bounds.size.width;
+        let numberOfCellsPerRow = 3
+        //let oddEven = indexPath.row / numberOfCellsPerRow % 2
+        let dimensions = CGFloat(Int(totalwidth) / numberOfCellsPerRow)
+        return CGSizeMake(dimensions, dimensions)
+            }
     
     @IBAction func OnViewChange(sender: AnyObject) {
         
         if(viewToggle.selectedSegmentIndex == 1){
         tableView.hidden = true
         listView.hidden = false
-          refreshControlAction(refreshControl)  
           self.listView.reloadData()   
         }
         else if(viewToggle.selectedSegmentIndex == 0){
