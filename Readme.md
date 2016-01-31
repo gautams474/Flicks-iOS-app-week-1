@@ -9,17 +9,17 @@ Time spent: 12 hours spent in total
 ## User Stories
 
 The following **required** functionality is complete:
-* [ ] User can view a list of movies currently playing in theaters from The Movie Database.
-* [ ] Poster images are loaded using the UIImageView category in the AFNetworking library.
-* [ ] User sees a loading state while waiting for the movies API (you can use any 3rd party library available to do this)
-* [ ] User can pull to refresh the movie list
+* [x] User can view a list of movies currently playing in theaters from The Movie Database.
+* [x] Poster images are loaded using the UIImageView category in the AFNetworking library.
+* [x] User sees a loading state while waiting for the movies API (you can use any 3rd party library available to do this)
+* [x] User can pull to refresh the movie list
 
 The following **optional** features are implemented:
-* [ ]Movies are displayed using a CollectionView and a TableView.
+* [x]Movies are displayed using a CollectionView and a TableView.
 
 The following **additional** features are implemented:
 
-- [ ] Toggling Views added using segmented control
+- [x] Toggling Views added using segmented control
 
 
 ## Video Walkthrough 
