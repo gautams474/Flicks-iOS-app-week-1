@@ -15,6 +15,7 @@
 		C78083071C4AF08E0036F7BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C78083061C4AF08E0036F7BC /* Assets.xcassets */; };
 		C780830A1C4AF08E0036F7BC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C78083081C4AF08E0036F7BC /* LaunchScreen.storyboard */; };
 		C78083121C4AF2DB0036F7BC /* MoviesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78083111C4AF2DB0036F7BC /* MoviesViewController.swift */; };
+		C7C99C531C6042BE005B984E /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C99C521C6042BE005B984E /* DetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		C78083091C4AF08E0036F7BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C780830B1C4AF08E0036F7BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C78083111C4AF2DB0036F7BC /* MoviesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoviesViewController.swift; sourceTree = "<group>"; };
+		C7C99C521C6042BE005B984E /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		D02F383E95AC1B25F2B8F926 /* Pods_Flicks.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Flicks.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -89,6 +91,7 @@
 				C78083081C4AF08E0036F7BC /* LaunchScreen.storyboard */,
 				C780830B1C4AF08E0036F7BC /* Info.plist */,
 				C78083111C4AF2DB0036F7BC /* MoviesViewController.swift */,
+				C7C99C521C6042BE005B984E /* DetailViewController.swift */,
 			);
 			path = Flicks;
 			sourceTree = "<group>";
@@ -227,6 +230,7 @@
 			files = (
 				C78083001C4AF08E0036F7BC /* AppDelegate.swift in Sources */,
 				C78083121C4AF2DB0036F7BC /* MoviesViewController.swift in Sources */,
+				C7C99C531C6042BE005B984E /* DetailViewController.swift in Sources */,
 				C74B0ECB1C55D22100BA0CB4 /* ListCell.swift in Sources */,
 				C746B1591C4C3CBD00303972 /* MovieCell.swift in Sources */,
 			);
