@@ -13,6 +13,9 @@ The following **required** functionality is complete:
 * [x] Poster images are loaded using the UIImageView category in the AFNetworking library.
 * [x] User sees a loading state while waiting for the movies API (you can use any 3rd party library available to do this)
 * [x] User can pull to refresh the movie list
+* Week 2
+* [x] User can view movie details by tapping on a cell
+* [x] User can select from a tab bar for either Now Playing or Top Rated movies.
 
 The following **optional** features are implemented:
 * [x] Movies are displayed using a CollectionView and a TableView.
