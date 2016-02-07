@@ -10,15 +10,17 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController , UITableViewDataSource, UITableViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate {
+class MoviesViewController: UIViewController , UITableViewDataSource, UITableViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate,UISearchBarDelegate {
 
     let refreshControl = UIRefreshControl()
     @IBOutlet weak var NetworkLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var listView: UICollectionView!
     @IBOutlet weak var viewToggle: UISegmentedControl!
     
     var movies: [NSDictionary]?
+    var filteredData: [NSDictionary]?
     var endpoint: String!
     
     override func viewDidLoad() {
@@ -27,6 +29,10 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
         tableView.delegate = self
         listView.dataSource = self
         listView.delegate = self
+        searchBar.delegate = self
+        
+        let viewButton = UIBarButtonItem(customView: viewToggle)
+        navigationItem.rightBarButtonItem = viewButton
         
         NetworkLabel.hidden = true
         listView.hidden = true
@@ -58,7 +64,7 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
-        let request = NSURLRequest(URL: url!)
+        let request = NSURLRequest(URL: url!, cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = NSURLSession(
             configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
             delegate:nil,
@@ -78,8 +84,9 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
                             NSLog("response: \(responseDictionary)")
-                            print("response: \(responseDictionary)")
+                           // print("response: \(responseDictionary)")
                             self.movies = responseDictionary["results"] as? [NSDictionary]
+                            self.filteredData = self.movies
                             self.tableView.reloadData();
                             self.NetworkLabel.hidden = true
                             refreshControl.endRefreshing()
@@ -87,7 +94,10 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
                     else{
                         self.NetworkLabel.hidden = false
                         MBProgressHUD.hideHUDForView(self.view, animated: true)
+                        self.tableView.reloadData();
+                        
                         refreshControl.endRefreshing()
+                        self.refreshControlAction(refreshControl) 
                     }
                     if(error != nil){
                         self.NetworkLabel.hidden = false
@@ -96,18 +106,39 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
                     }
                 }
         });
-        
+        print(task.response)
+        print(task.error)
+        print(request)
             delay(0.5) {
                 
             }
             self.refreshControl.endRefreshing()
+        
         task.resume()
     
     }
     
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        filteredData = searchText.isEmpty ? movies : movies?.filter({(movie: NSDictionary) -> Bool in
+            if let title = movie["title"] as? String {
+                return title.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+            }
+            return false
+        })
+        if(viewToggle.selectedSegmentIndex == 1){
+        tableView.reloadData()
+        }
+        else{
+            listView.reloadData()
+        }
+        
+    }
+    
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
-        if let movies  = movies  {
-            return movies.count
+        if let filteredData  = filteredData  {
+            return filteredData.count
         }
         else{
             return 0
@@ -121,14 +152,73 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
         let movie = movies! [indexPath.row]
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
-        let baseUrl = "http://image.tmdb.org/t/p/w500"
-        if let posterPath = movie["poster_path"] as? String{
+        //let baseUrl = "http://image.tmdb.org/t/p/w500"
+        let smallBaseUrl = "http://image.tmdb.org/t/p/w45"
+        let largeBaseUrl = "http://image.tmdb.org/t/p/original"
+        
+        
+     /*   if let posterPath = movie["poster_path"] as? String{
             let imageUrl = NSURL(string: baseUrl + posterPath)
             cell.posterView.setImageWithURL(imageUrl!)
+        }
+        */
+        if let posterPath = movie["poster_path"] as? String {
+            let smallImageUrl = NSURL(string: smallBaseUrl + posterPath)
+            let largeImageUrl = NSURL(string: largeBaseUrl + posterPath)
+            // cell.posterView.setImageWithURL(posterUrl!)
+            
+            
+            let smallImageRequest = NSURLRequest(URL: smallImageUrl!)
+            let largeImageRequest = NSURLRequest(URL: largeImageUrl!)
+            
+            cell.posterView.setImageWithURLRequest(
+                smallImageRequest,
+                placeholderImage: nil,
+                success: { (smallImageRequest, smallImageResponse, smallImage) -> Void in
+                    
+                    // smallImageResponse will be nil if the smallImage is already available
+                    // in cache (might want to do something smarter in that case).
+                    cell.posterView.alpha = 0.0
+                    cell.posterView.image = smallImage;
+                    
+                    UIView.animateWithDuration(0.3, animations: { () -> Void in
+                        
+                        cell.posterView.alpha = 1.0
+                        
+                        }, completion: { (sucess) -> Void in
+                            
+                            // The AFNetworking ImageView Category only allows one request to be sent at a time
+                            // per ImageView. This code must be in the completion block.
+                            cell.posterView.setImageWithURLRequest(
+                                largeImageRequest,
+                                placeholderImage: smallImage,
+                                success: { (largeImageRequest, largeImageResponse, largeImage) -> Void in
+                                    
+                                    cell.posterView.image = largeImage;
+                                    
+                                },
+                                failure: { (request, response, error) -> Void in
+                                    // do something for the failure condition of the large image request
+                                    // possibly setting the ImageView's image to a default image
+                            })
+                    })
+                },
+                failure: { (request, response, error) -> Void in
+                    // do something for the failure condition
+                    // possibly try to get the large image
+            })
+        }
+        else {
+            cell.posterView.image = nil
         }
         
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
+        
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.yellowColor()
+        cell.selectedBackgroundView = backgroundView
+        
         
         return cell
     }
@@ -144,6 +234,8 @@ class MoviesViewController: UIViewController , UITableViewDataSource, UITableVie
         let movie = movies![indexPath!.row]
         let detailViewController = segue.destinationViewController as! DetailViewController
         detailViewController.movie = movie
+        
+        cell.selected = false
         
     }
     
